@@ -18,4 +18,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 // Depending on provider, searches
-Route::get('/{provider}/search', 'SearchController@search');
+Route::get('/{provider}/search', 'SearchController@search')->middleware('client');;

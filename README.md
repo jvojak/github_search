@@ -28,3 +28,15 @@
 
 8. Create database (localhost/phpmyadmin)
 9. php artisan migrate
+
+10. http://github.test/oauth/token
+POST request, body parameters
+	'grant_type' => 'client_credentials',
+    'client_id' => 'client-id',
+    'client_secret' => 'client-secret',
+    'scope' => 'your-scope',
+
+11. http://github.test/api/github/search?term=windows
+GET request
+Authorization OAuth2.0
+Paste access token
