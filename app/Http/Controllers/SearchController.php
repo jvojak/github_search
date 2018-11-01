@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use GuzzleHttp;
+use App\Helpers\GithubHelper;
+use App\Helpers\MathHelper;
+
 use App\Term;
 
 class SearchController extends Controller
@@ -24,57 +26,41 @@ class SearchController extends Controller
       {
         return response()->json( ['term' => $term, 'response' => 'Insufficient parameters!'] );
       }
-
-      $client = new GuzzleHttp\Client();
-      $term_rocks = $term. ' rocks';
-      $term_sucks = $term. ' sucks';
       
+      // If the term is already queried in the past, its score should be stored in DB
       if($model = Term::where(['provider' => $provider, 'term' => $term])->first())
       {
-        return response()->json( ['term' => $model->term, 'score' => $model->score] );
+        return response()->json( [
+          'term' => $model->term, 
+          'score' => $model->score] 
+        );
       }
+
+      $term_rocks = $term. ' rocks';
+      $term_sucks = $term. ' sucks';
       
       switch($provider)
       {
         case 'github':
-          // Get positive results
-          $res = $client->request('GET', 'https://api.github.com/search/issues?',
-            [
-              'query' => ['q' => $term_rocks]
-            ]);
-          $res = json_decode($res->getBody());
-          $positive = $res->total_count;
+          // Github positive and negative results
+          $positive = GithubHelper::searchIssues($term_rocks);
+          $negative = GithubHelper::searchIssues($term_sucks);
 
-          // Get negative results
-          $res = $client->request('GET', 'https://api.github.com/search/issues?',
-            [
-              'query' => ['q' => $term_sucks]
-            ]);
-          $res = json_decode($res->getBody());
-          $negative = $res->total_count;
+          $score = MathHelper::calculatePopularity($positive, $negative);
 
-          // Check for division by ZERO
-          if( $negative == 0 )
-          {
-            $score = 'Infinite';
-          }
-          else
-          {
-            $score = ( $positive / ( $positive + $negative) ) * 10;
-          }
-
-          $model = Term::create(
-            [
+          $model = Term::create([
               'term' => $term,
               'provider' => $provider,
               'score' => $score
             ]);
-
           break;
         default:
           break;
       }
 
-      return response()->json( ['term' => $model->term, 'score' => $model->score] );
+      return response()->json([
+        'term' => $model->term, 
+        'score' => $model->score
+      ]);
     }
 }

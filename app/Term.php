@@ -12,6 +12,6 @@ class Term extends Model
      * @var array
      */
     protected $fillable = [
-        'term', 'score',
+        'term', 'provider', 'score',
     ];
 }
