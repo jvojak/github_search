@@ -40,3 +40,5 @@ POST request, body parameters
 GET request
 Authorization OAuth2.0
 Paste access token
+
+12. /v1/ & /v2/

@@ -38,7 +38,7 @@ class SearchController extends Controller
       // If the term is already queried in the past, its score should be stored in DB
       if($model = Term::where(['provider' => $provider, 'term' => $term])->first())
       {
-        new TermResource($model);
+        return new TermResource($model);
       }
 
       $term_rocks = $term. ' rocks';
