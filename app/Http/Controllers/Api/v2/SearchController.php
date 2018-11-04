@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Validator;
 
 use App\Term;
+use App\Http\Resources\Term as TermResource;
 
 class SearchController extends Controller
 {
@@ -37,10 +38,7 @@ class SearchController extends Controller
       // If the term is already queried in the past, its score should be stored in DB
       if($model = Term::where(['provider' => $provider, 'term' => $term])->first())
       {
-        return response()->json( [
-          'term' => $model->term, 
-          'score' => $model->score] 
-        );
+        new TermResource($model);
       }
 
       $term_rocks = $term. ' rocks';
@@ -52,22 +50,19 @@ class SearchController extends Controller
           // Github positive and negative results
           $positive = GithubHelper::searchIssues($term_rocks);
           $negative = GithubHelper::searchIssues($term_sucks);
+
+          // Calculating score
+          $score = MathHelper::calculatePopularity($positive, $negative);
+          $model = Term::create([
+              'term' => $term,
+              'provider' => $provider,
+              'score' => $score
+            ]);
           break;
         default:
           break;
       }
 
-      // Calculating score
-      $score = MathHelper::calculatePopularity($positive, $negative);
-      $model = Term::create([
-          'term' => $term,
-          'provider' => $provider,
-          'score' => $score
-        ]);
-
-      return response()->json([
-        'term' => $model->term, 
-        'score' => $model->score
-      ]);
+      return new TermResource($model);
     }
 }
