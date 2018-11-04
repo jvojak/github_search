@@ -17,5 +17,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Depending on provider, searches
-Route::get('/{provider}/search', 'SearchController@search')->middleware('client');;
+
+Route::group(['prefix' => 'v1'], function () {
+	// Searches queried term within a given social provider for popularity score (0-10)
+	Route::get('/{provider}/search', 'Api\v1\SearchController@search')->middleware('client');;
+});
+
+Route::group(['prefix' => 'v2'], function () {
+	// Searches queried term within a given social provider for popularity score (0-10)
+	Route::get('/{provider}/search', 'Api\v2\SearchController@search')->middleware('client');;
+});

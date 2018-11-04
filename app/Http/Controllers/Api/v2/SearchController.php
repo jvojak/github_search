@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\v2;
 use Illuminate\Http\Request;
 use App\Helpers\GithubHelper;
 use App\Helpers\MathHelper;
+use App\Http\Controllers\Controller;
+use Validator;
 
 use App\Term;
 
@@ -19,14 +21,19 @@ class SearchController extends Controller
      */
     public function search( $provider, Request $request )
     {
+
+      // Request validation rules
+      $validator = Validator::make($request->all(), [
+          'term' => 'required|max:255|min:2',
+      ]);
+
+      // If validator failes, return json response with validation errors
+      if ($validator->fails()) {    
+        return response()->json($validator->messages(), 200);
+      }
+
       $term = $request->input('term');
 
-      // If query string is empty or is not set, return response
-      if($term == NULL)
-      {
-        return response()->json( ['term' => $term, 'response' => 'Insufficient parameters!'] );
-      }
-      
       // If the term is already queried in the past, its score should be stored in DB
       if($model = Term::where(['provider' => $provider, 'term' => $term])->first())
       {
@@ -45,18 +52,18 @@ class SearchController extends Controller
           // Github positive and negative results
           $positive = GithubHelper::searchIssues($term_rocks);
           $negative = GithubHelper::searchIssues($term_sucks);
-
-          $score = MathHelper::calculatePopularity($positive, $negative);
-
-          $model = Term::create([
-              'term' => $term,
-              'provider' => $provider,
-              'score' => $score
-            ]);
           break;
         default:
           break;
       }
+
+      // Calculating score
+      $score = MathHelper::calculatePopularity($positive, $negative);
+      $model = Term::create([
+          'term' => $term,
+          'provider' => $provider,
+          'score' => $score
+        ]);
 
       return response()->json([
         'term' => $model->term, 
