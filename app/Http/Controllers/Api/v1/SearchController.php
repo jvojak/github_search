@@ -25,7 +25,7 @@ class SearchController extends Controller
       // If query string is empty or is not set, return response
       if($term == NULL)
       {
-        return response()->json( ['term' => $term, 'response' => 'Insufficient parameters!'] );
+        return response()->json( ['term' => $term, 'response' => 'Insufficient parameters!'], 200);
       }
       
       // If the term is already queried in the past, its score should be stored in DB
@@ -56,6 +56,7 @@ class SearchController extends Controller
             ]);
           break;
         default:
+          return response()->json(['term' => $term, 'response' => 'Provider not yet supported!'] , 200);
           break;
       }
 

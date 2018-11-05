@@ -14,9 +14,9 @@ class SearchController extends Controller
 {
 
     /**
-     * Search {provider} issues with a given word
+     * Search issues {provider} with a given word
      *
-     * @param $provider - github, twitter, ..
+     * @param $provider - social provider used to get word popularity (github, twitter, etc.) - currently only Github is integrated
      * @param Request $request
      * @return JSON response
      */
@@ -60,6 +60,7 @@ class SearchController extends Controller
             ]);
           break;
         default:
+          return response()->json(['term' => $term, 'response' => 'Provider not yet supported!'] , 200);
           break;
       }
 
