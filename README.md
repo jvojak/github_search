@@ -14,7 +14,7 @@ API endpoint that uses social provider (such as GitHub) external API to provide 
 2. Open: C:\Windows\System32\drivers\etc\hosts
 3. Append to end of file:
 	`
-	127.0.0.1.		github.search
+	127.0.0.1		github.test
 	`
 4. Open: C:\xampp\apache\conf\extra\httpd-vhosts.conf
 5. Append to the end of the file:
@@ -33,10 +33,9 @@ API endpoint that uses social provider (such as GitHub) external API to provide 
 6. Open cmd, position yourself into {PROJECT_ROOT_FOLDER} and run following commands:
 ```
 	composer install
-	php artisan migrate
 ```
 
-7. Change .env variables:
+7. Change .env variables (you can copy .env.example content into your .env file):
 ```
 	DB_CONNECTION=mysql
 	DB_HOST=127.0.0.1
@@ -52,6 +51,15 @@ php artisan migrate
 ```
 10. Restart `xampp` service
 11. At this point, check that you're able to access your project at `github.test` 
+12. Create encryption keys for OAuth
+```
+php artisan passport:install
+```
+13. Create client credentials for OAuth that you will be using
+```
+php artisan passport:client --client
+```
+name the client `client`
 
 # API Usage
 
@@ -80,6 +88,8 @@ Using Postman:
 	Secret - client secret
 	Grant Type - Client Credentials
 
+Use token (as bearer, in header - click on use token)
+
 - Expected output:
 ```json
 {
@@ -97,6 +107,8 @@ Using Postman:
 	Client ID - the one that is generated in your database (table oauth_clients, with name 'client'
 	Secret - client secret
 	Grant Type - Client Credentials
+
+Use token (as bearer, in header - click on use token)
 
 - Expected output:
 ```json
@@ -116,6 +128,8 @@ Using Postman:
 	Client ID - the one that is generated in your database (table oauth_clients, with name 'client'
 	Secret - client secret
 	Grant Type - Client Credentials
+
+Use token (as bearer, in header - click on use token)
 
 - Expected output:
 ```json
@@ -149,6 +163,8 @@ Using Postman:
 	Secret - client secret
 	Grant Type - Client Credentials
 
+Use token (as bearer, in header - click on use token)
+
 - Expected output:
 ```json
 {
@@ -173,6 +189,8 @@ Using Postman:
 	Secret - client secret
 	Grant Type - Client Credentials
 
+Use token (as bearer, in header - click on use token)
+
 - Expected output:
 ```json
 {
@@ -192,6 +210,8 @@ Using Postman:
 	Client ID - the one that is generated in your database (table oauth_clients, with name 'client'
 	Secret - client secret
 	Grant Type - Client Credentials
+
+Use token (as bearer, in header - click on use token)
 
 - Expected output:
 ```json
